@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Архитектор | ai_in_mask</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050810;
+    --card: #0d1117;
+    --border: rgba(99, 179, 237, 0.15);
+    --blue: #63b3ed;
+    --purple: #9f7aea;
+    --glow: rgba(99, 179, 237, 0.3);
+    --text: #e2e8f0;
+    --muted: #718096;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 20px 16px 60px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(99,179,237,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(159,122,234,0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* AVATAR */
+  .avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 0 24px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .avatar-ring {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    box-shadow: 0 0 30px var(--glow);
+    margin-bottom: 16px;
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 30px var(--glow); }
+    50% { box-shadow: 0 0 60px var(--glow), 0 0 80px rgba(159,122,234,0.2); }
+  }
+
+  .avatar-ring img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #1a2035;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a2035, #0d1117);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+  }
+
+  .name {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+  }
+
+  .handle {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .bio {
+    font-size: 13px;
+    color: #a0aec0;
+    text-align: center;
+    line-height: 1.6;
+    max-width: 300px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 20px 0;
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 10px;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 14px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .btn:hover::before { opacity: 1; }
+  .btn:hover { transform: translateY(-2px); border-color: rgba(99,179,237,0.4); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, rgba(99,179,237,0.15), rgba(159,122,234,0.15));
+    color: var(--text);
+  }
+  .btn-primary::before {
+    background: linear-gradient(135deg, rgba(99,179,237,0.25), rgba(159,122,234,0.25));
+  }
+  .btn-primary:hover { box-shadow: 0 8px 30px rgba(99,179,237,0.2); }
+
+  .btn-boosty {
+    background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,153,51,0.1));
+    border-color: rgba(255,107,53,0.3);
+    color: var(--text);
+  }
+  .btn-boosty::before {
+    background: linear-gradient(135deg, rgba(255,107,53,0.25), rgba(255,153,51,0.15));
+  }
+  .btn-boosty:hover { box-shadow: 0 8px 30px rgba(255,107,53,0.2); border-color: rgba(255,107,53,0.5); }
+
+  .btn-tg {
+    background: linear-gradient(135deg, rgba(41,182,246,0.15), rgba(2,136,209,0.1));
+    border-color: rgba(41,182,246,0.3);
+    color: var(--text);
+  }
+  .btn-tg:hover { box-shadow: 0 8px 30px rgba(41,182,246,0.2); border-color: rgba(41,182,246,0.5); }
+
+  .btn-eleven {
+    background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(168,85,247,0.1));
+    border-color: rgba(236,72,153,0.3);
+    color: var(--text);
+  }
+  .btn-eleven:hover { box-shadow: 0 8px 30px rgba(236,72,153,0.2); }
+
+  .btn-make {
+    background: linear-gradient(135deg, rgba(99,179,237,0.12), rgba(56,189,248,0.08));
+    border-color: rgba(99,179,237,0.25);
+    color: var(--text);
+  }
+
+  .btn-cursor {
+    background: linear-gradient(135deg, rgba(159,122,234,0.12), rgba(99,179,237,0.08));
+    border-color: rgba(159,122,234,0.25);
+    color: var(--text);
+  }
+
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.05);
+  }
+
+  .btn-content { flex: 1; }
+  .btn-title { font-size: 14px; font-weight: 600; display: block; }
+  .btn-sub { font-size: 11px; color: var(--muted); margin-top: 2px; display: block; }
+
+  .btn-arrow {
+    color: var(--muted);
+    font-size: 16px;
+    transition: transform 0.3s;
+  }
+  .btn:hover .btn-arrow { transform: translateX(4px); color: var(--blue); }
+
+  /* PRICING CARDS */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .price-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 10px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.3s;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .price-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(99,179,237,0.4);
+    box-shadow: 0 10px 30px rgba(99,179,237,0.15);
+  }
+
+  .price-card.featured {
+    border-color: rgba(99,179,237,0.5);
+    background: linear-gradient(135deg, rgba(99,179,237,0.08), rgba(159,122,234,0.08));
+  }
+
+  .price-emoji { font-size: 20px; margin-bottom: 6px; display: block; }
+  .price-name { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .price-amount { font-size: 16px; font-weight: 700; color: var(--blue); margin: 4px 0; font-family: 'Orbitron', monospace; }
+  .price-period { font-size: 9px; color: var(--muted); }
+
+  /* STATS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stat-label { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+  /* BADGE */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(99,179,237,0.1);
+    border: 1px solid rgba(99,179,237,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: var(--blue);
+    margin-bottom: 20px;
+    animation: fadeDown 0.4s ease both;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    background: #48bb78;
+    border-radius: 50%;
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .btn:nth-child(1) { animation-delay: 0.1s; }
+  .btn:nth-child(2) { animation-delay: 0.2s; }
+  .btn:nth-child(3) { animation-delay: 0.3s; }
+  .btn:nth-child(4) { animation-delay: 0.4s; }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* SCANLINE EFFECT */
+  .scanline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+  }
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+  <!-- AVATAR -->
+  <div class="avatar-section">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Активен сейчас
+    </div>
+    <div class="avatar-ring">
+      <div class="avatar-placeholder">🤖</div>
+    </div>
+    <div class="name">AI АРХИТЕКТОР</div>
+    <div class="handle">@ai_in_mask</div>
+    <div class="bio">Анонимно о главном. AI инструменты, автоматизация и заработок с помощью ИИ — без воды.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">20+</div>
+      <div class="stat-label">AI инструментов</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">3</div>
+      <div class="stat-label">уровня клуба</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">автоматизаций</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MAIN LINKS -->
+  <div class="section-label">🔒 Закрытый клуб</div>
+
+  <a href="https://boosty.to/ai_in_mask" class="btn btn-boosty">
+    <div class="btn-icon">🔒</div>
+    <div class="btn-content">
+      <span class="btn-title">Закрытый клуб</span>
+      <span class="btn-sub">Эксклюзивный контент и шаблоны</span>
+    </div>
+    <span class="btn-arrow">›</span>
+  </a>
+
+  <!-- PRICING -->
+  <div class="pricing-grid">
+    <a href="https://boosty.to/ai_in_mask" class="price-card">
+      <span class="price-emoji">🔓</span>
+      <div class="price-name">Базовый</div>
+      <div class="price-amount">299</div>
+      <div class="price-period">₽/мес</div>
+    </a>
+    <a href="https://boosty.to/ai_in_mask" class="price-card featured">
+      <span class="price-emoji">⚡</span>
+      <div class="price-name">Продвинутый</div>
+      <div class="price-amount">990</div>
+      <div class="price-period">₽/мес</div>
+    </a>
+    <a href="https://boosty.to/ai_in_mask" class="price-card">
+      <span class="price-emoji">🔥</span>
+      <div class="price-name">VIP</div>
+      <div class="price-amount">2990</div>
+      <div class="price-period">₽/мес</div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SOCIAL -->
+  <div class="section-label">📡 Каналы</div>
+
+  <a href="https://t.me/ai_in_mask" class="btn btn-tg">
+    <div class="btn-icon">✈️</div>
+    <div class="btn-content">
+      <span class="btn-title">Telegram канал</span>
+      <span class="btn-sub">Ежедневный контент про AI</span>
+    </div>
+    <span class="btn-arrow">›</span>
+  </a>
+
+  <a href="https://instagram.com/ai_in_mask" class="btn btn-primary">
+    <div class="btn-icon">📸</div>
+    <div class="btn-content">
+      <span class="btn-title">Instagram</span>
+      <span class="btn-sub">Reels и сторис про AI</span>
+    </div>
+    <span class="btn-arrow">›</span>
+  </a>
+
+  <div class="divider"></div>
+
+  <!-- TOOLS -->
+  <div class="section-label">🛠 AI Инструменты</div>
+
+  <a href="https://try.elevenlabs.io/qxn8e6hfd972" class="btn btn-eleven">
+    <div class="btn-icon">🎙</div>
+    <div class="btn-content">
+      <span class="btn-title">ElevenLabs</span>
+      <span class="btn-sub">AI голос — использую сам</span>
+    </div>
+    <span class="btn-arrow">›</span>
+  </a>
+
+  <a href="https://make.com" class="btn btn-make">
+    <div class="btn-icon">⚡</div>
+    <div class="btn-content">
+      <span class="btn-title">Make.com</span>
+      <span class="btn-sub">Автоматизация без кода</span>
+    </div>
+    <span class="btn-arrow">›</span>
+  </a>
+
+  <a href="https://cursor.com" class="btn btn-cursor">
+    <div class="btn-icon">💻</div>
+    <div class="btn-content">
+      <span class="btn-title">Cursor</span>
+      <span class="btn-sub">AI редактор кода</span>
+    </div>
+    <span class="btn-arrow">›</span>
+  </a>
+
+  <a href="https://leonardo.ai" class="btn btn-primary">
+    <div class="btn-icon">🎨</div>
+    <div class="btn-content">
+      <span class="btn-title">Leonardo AI</span>
+      <span class="btn-sub">Генерация изображений</span>
+    </div>
+    <span class="btn-arrow">›</span>
+  </a>
+
+  <div class="footer">
+    🤖 AI Архитектор · @ai_in_mask<br>
+    <span style="margin-top:4px;display:block">Анонимно о главном</span>
+  </div>
+
+</div>
+</body>
+</html>
